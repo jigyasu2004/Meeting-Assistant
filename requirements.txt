@@ -1,0 +1,13 @@
+openai-whisper
+torch
+torchaudio
+numpy
+sounddevice
+pyside6
+openai
+keyboard
+pywin32
+colorama
+requests
+soundfile
+scipy

@@ -1,0 +1,22 @@
+# User Configuration
+config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+.env
+meet/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log

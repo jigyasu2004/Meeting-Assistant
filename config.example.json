@@ -1,0 +1,17 @@
+{
+    "audio_device_index": 1,
+    "transcription_mode": "local",
+    "openai_api_key": "YOUR_OPENAI_API_KEY_HERE",
+    "llm_model": "gpt-5.1",
+    "prompt_template": "You are my real-time meeting assistant.\nTranslate the following text into Hindi.\n\nUser text:\n{{transcript}}",
+    "overlay_opacity": 70,
+    "font_size": 24,
+    "font_color": "#FFFFFF",
+    "font_family": "Arial",
+    "overlay_x": 100,
+    "overlay_y": 100,
+    "overlay_width": 800,
+    "overlay_height": 400,
+    "whisper_model_size": "small",
+    "bg_color": "#002800"
+}

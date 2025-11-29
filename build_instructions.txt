@@ -1,0 +1,61 @@
+# Build Instructions for Real-Time Meeting Assistant
+
+## Prerequisites
+
+1. **Python 3.11** installed.
+2. **FFmpeg** installed and added to system PATH (Required for Whisper).
+   - Download from: https://ffmpeg.org/download.html
+3. **VB-Audio Virtual Cable** installed.
+   - Download from: https://vb-audio.com/Cable/
+   - Set "CABLE Output" as your Input Device in the App Settings.
+   - Set "CABLE Input" as the Output Device in your Meeting App (Zoom/Teams).
+   - Use Windows Sound Control Panel to "Listen to this device" on CABLE Output if you want to hear the audio too.
+
+## Installation
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+
+2. Install PyTorch with CUDA support (for GPU acceleration):
+   - Check your CUDA version (e.g., 11.8 or 12.1).
+   - Run command from https://pytorch.org/get-started/locally/
+   - Example (CUDA 12.1):
+     ```bash
+     pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+     ```
+
+3. Install other dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Running the App
+
+```bash
+python main.py
+```
+
+## Packaging with PyInstaller
+
+To create a standalone .exe:
+
+1. Install PyInstaller:
+   ```bash
+   pip install pyinstaller
+   ```
+
+2. Run the build command:
+   ```bash
+   pyinstaller --noconfirm --onedir --windowed --name "MeetingAssistant" --add-data "config.json;." --hidden-import="whisper" --hidden-import="pyside6" main.py
+   ```
+
+3. The output will be in the `dist/MeetingAssistant` folder.
+
+## Troubleshooting
+
+- **Whisper Error**: If you get "FileNotFoundError: [WinError 2] The system cannot find the file specified", ensure FFmpeg is in your PATH.
+- **CUDA Not Found**: Ensure you installed the specific CUDA version of PyTorch. Run `python -c "import torch; print(torch.cuda.is_available())"` to verify.
+- **Overlay Not Click-Through**: Ensure "Lock Overlay" is checked in Settings.
