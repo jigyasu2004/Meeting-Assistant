@@ -144,6 +144,8 @@ Want to run the app without Python installed? You can build a standalone `.exe` 
     - Go to the `dist/MeetingAssistant` folder.
     - You will find `MeetingAssistant.exe` there.
     - You can zip this folder and share it with others!
+    
+[Download EXE](https://drive.google.com/file/d/1dDGS279tM2RPPXtQN-Hg6Qt4EkXXnZ1d/view?usp=sharing)
 
 ---
 
