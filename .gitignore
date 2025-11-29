@@ -20,3 +20,8 @@ meet/
 # Logs
 logs/
 *.log
+
+# Build Artifacts
+build/
+dist/
+*.spec

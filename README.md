@@ -132,6 +132,21 @@ Want to test the app without a real meeting? You can use a YouTube video.
 
 ---
 
+## 📦 Building an Executable (.exe)
+
+Want to run the app without Python installed? You can build a standalone `.exe` file.
+
+1.  **Run the Build Script**:
+    - Double-click `build_exe.bat`.
+    - Wait for the process to finish (it may take a few minutes).
+
+2.  **Locate the App**:
+    - Go to the `dist/MeetingAssistant` folder.
+    - You will find `MeetingAssistant.exe` there.
+    - You can zip this folder and share it with others!
+
+---
+
 ## ⌨️ Hotkeys
 
 | Hotkey | Action |

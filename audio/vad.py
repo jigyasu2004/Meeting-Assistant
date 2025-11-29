@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import os
 from utils.logger import logger
 
 class SileroVAD:
@@ -12,11 +13,24 @@ class SileroVAD:
     def load_model(self):
         try:
             logger.info(f"Loading Silero VAD on {self.device}...")
-            self.model, self.utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
-                                                    model='silero_vad',
-                                                    force_reload=False,
-                                                    onnx=False)
-            self.model.to(self.device)
+            
+            # Check for local model first (for EXE)
+            local_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'silero_vad.jit')
+            if os.path.exists(local_path):
+                logger.info(f"Loading local VAD model from {local_path}")
+                self.model = torch.jit.load(local_path)
+                self.model.to(self.device)
+                # Utils are not loaded with JIT, but we only use the model for inference
+                self.utils = None 
+            else:
+                # Fallback to Hub (for Dev)
+                logger.info("Local model not found, downloading from Hub...")
+                self.model, self.utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
+                                                        model='silero_vad',
+                                                        force_reload=False,
+                                                        onnx=False)
+                self.model.to(self.device)
+            
             logger.info("Silero VAD loaded successfully.")
         except Exception as e:
             logger.error(f"Failed to load Silero VAD: {e}")
