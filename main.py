@@ -31,6 +31,7 @@ class MainApp(QObject):
         
         self.is_transcribing = False
         self.accumulated_transcript = [] # List to store transcript chunks
+        self.chat_history = [] # List of {"role": "user"|"assistant", "content": "..."}
         self.last_transcript = ""
 
         # Audio Listener
@@ -92,27 +93,49 @@ class MainApp(QObject):
     @Slot()
     def send_to_ai(self):
         if not self.accumulated_transcript:
-            self.update_overlay_signal.emit("System", "No transcript to send.")
+            self.update_overlay_signal.emit("System", "No new transcript to send.")
             return
 
-        full_text = " ".join(self.accumulated_transcript)
+        # Get the new text
+        new_text = " ".join(self.accumulated_transcript)
+        
+        # Clear the buffer immediately so subsequent speech is treated as new
+        self.accumulated_transcript = []
+        
         self.update_overlay_signal.emit("System", "Sending to AI...")
         
         # Process with LLM in background
-        threading.Thread(target=self.process_llm, args=(full_text,)).start()
+        threading.Thread(target=self.process_llm, args=(new_text,)).start()
 
     @Slot()
     def clear_text(self):
         self.accumulated_transcript = []
+        self.chat_history = []
         self.overlay.text_browser.clear()
-        self.update_overlay_signal.emit("System", "Transcript cleared.")
+        self.update_overlay_signal.emit("System", "Transcript and Chat History cleared.")
 
-    def process_llm(self, text):
+    def process_llm(self, new_text):
         try:
-            logger.info(f"Sending text to LLM: {text[:50]}...")
-            translated = self.translator.process(text)
-            logger.info(f"LLM Response: {translated[:50]}...")
-            self.update_overlay_signal.emit("AI", translated)
+            logger.info(f"Sending text to LLM: {new_text[:50]}...")
+            
+            # Add user message to history
+            # We apply the prompt template here if needed, but for chat, usually raw text is better
+            # If we want to support the "Translate this" template, we should apply it to the new_text
+            # But let's assume the template is the "System Instruction" for now, or just send raw text.
+            # To respect the user's config "prompt_template", we can use it to format the user message.
+            
+            prompt = self.translator.prompt_manager.get_prompt(new_text)
+            self.chat_history.append({"role": "user", "content": prompt})
+            
+            # Send full history
+            response = self.translator.process_with_history(self.chat_history)
+            
+            logger.info(f"LLM Response: {response[:50]}...")
+            
+            # Add assistant response to history
+            self.chat_history.append({"role": "assistant", "content": response})
+            
+            self.update_overlay_signal.emit("AI", response)
         except Exception as e:
             logger.error(f"LLM processing failed: {e}")
             self.update_overlay_signal.emit("System", f"AI Error: {e}")

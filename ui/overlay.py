@@ -1,5 +1,6 @@
 import sys
 import ctypes
+import markdown
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication, QTextBrowser, QFrame
 from PySide6.QtGui import QFont, QColor, QScreen
 from PySide6.QtCore import Qt, Slot
@@ -97,6 +98,17 @@ class OverlayWindow(QWidget):
                 padding: 10px;
             }}
         """)
+        
+        # Set a document stylesheet for HTML content within QTextBrowser
+        # Note: QTextBrowser supports a subset of CSS
+        self.text_browser.document().setDefaultStyleSheet(f"""
+            h1, h2, h3 {{ font-weight: bold; color: {text_color}; margin-top: 10px; font-size: {font_size + 4}pt; }}
+            p {{ margin-bottom: 5px; }}
+            code {{ background-color: rgba(255, 255, 255, 40); font-family: Consolas, monospace; }}
+            pre {{ background-color: rgba(0, 0, 0, 60); color: #EEE; padding: 10px; margin: 5px 0; }}
+            strong {{ font-weight: bold; color: #FFD700; }}
+            li {{ margin-left: 10px; }}
+        """)
 
     def hide_from_capture(self):
         try:
@@ -148,8 +160,24 @@ class OverlayWindow(QWidget):
             self.text_browser.insertHtml(html)
         else:
             # New block
-            html = f'<div style="margin-bottom: 10px;"><span style="color: {color}; font-weight: bold;">{prefix}{role}:</span> <span style="color: {color};">{text}</span></div>'
-            self.text_browser.append(html)
+            if role == "AI":
+                # Render Markdown for AI
+                try:
+                    # Convert markdown to HTML
+                    # extensions=['fenced_code', 'codehilite'] can be used if we want more features
+                    html_content = markdown.markdown(text, extensions=['fenced_code', 'nl2br'])
+                    
+                    # Wrap in a div with the role label
+                    html = f'<div style="margin-bottom: 10px; margin-top: 10px;"><span style="color: {color}; font-weight: bold; font-size: 1.1em;">{prefix}{role}:</span><br>{html_content}</div>'
+                    self.text_browser.append(html)
+                except Exception as e:
+                    logger.error(f"Markdown rendering failed: {e}")
+                    # Fallback to plain text
+                    html = f'<div style="margin-bottom: 10px;"><span style="color: {color}; font-weight: bold;">{prefix}{role}:</span> <span style="color: {color};">{text}</span></div>'
+                    self.text_browser.append(html)
+            else:
+                html = f'<div style="margin-bottom: 10px;"><span style="color: {color}; font-weight: bold;">{prefix}{role}:</span> <span style="color: {color};">{text}</span></div>'
+                self.text_browser.append(html)
         
         self.last_role = role
         

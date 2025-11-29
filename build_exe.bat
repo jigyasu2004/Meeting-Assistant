@@ -4,7 +4,7 @@ echo      Building Meeting Assistant EXE
 echo ==========================================
 
 echo 1. Installing PyInstaller...
-pip install pyinstaller
+pip install pyinstaller markdown
 
 echo 2. Cleaning up previous builds...
 rmdir /s /q build

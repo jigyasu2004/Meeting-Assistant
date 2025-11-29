@@ -10,5 +10,6 @@ pywin32
 colorama
 requests
 soundfile
-scipy
+scipyæ
 pyinstaller
+markdown

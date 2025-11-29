@@ -17,27 +17,29 @@ class Translator:
         self.client = OpenAI(api_key=key)
 
     def process(self, transcript):
+        # Legacy method for single-turn (kept for compatibility if needed, but we'll switch to history)
+        return self.process_with_history([{"role": "user", "content": transcript}])
+
+    def process_with_history(self, messages):
         if not self.client:
             logger.warning("OpenAI API Key not set for LLM.")
             return "Error: API Key missing"
 
-        prompt = self.prompt_manager.get_prompt(transcript)
         model = config_manager.get("llm_model", "gpt-3.5-turbo")
 
         try:
             # Determine token parameter based on model
-            # Newer models (o1, gpt-5-nano, etc.) require 'max_completion_tokens'
-            # Older models (gpt-3.5, gpt-4) use 'max_tokens'
             token_param = "max_tokens"
             if model.startswith("o1") or "gpt-5" in model:
                 token_param = "max_completion_tokens"
             
+            # Ensure system message exists if not provided
+            if not any(m['role'] == 'system' for m in messages):
+                messages.insert(0, {"role": "system", "content": "You are a helpful real-time meeting assistant."})
+
             kwargs = {
                 "model": model,
-                "messages": [
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
-                ],
+                "messages": messages,
                 token_param: 1000
             }
 
